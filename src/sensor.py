@@ -1,12 +1,9 @@
+from util.constants import PORT, SERVER, MONITOR_SEGMENT_LENGTH
+
 import asyncio
 import websockets
 import sounddevice as sd
 import numpy as np
-
-# constants
-SERVER = "ws://localhost"
-PORT = 8765
-monitorTime = 10 # seconds
 
 class SoundClassifier():
     def __init__(self):
@@ -15,8 +12,8 @@ class SoundClassifier():
 class SoundListener():
     soundState = []
 
-    def getSoundState(self, indata, outdata, frames, time, status):
-        volumeNorm = np.linalg.norm(indata)*10
+    def getSoundState(self, inData, outData, frames, time, status):
+        volumeNorm = np.linalg.norm(inData)*10
 
         print("*" * int(volumeNorm))  # debug output
         self.soundState.append(volumeNorm.round(4))
@@ -36,7 +33,7 @@ class SoundListener():
             # the state is stored inside the soundState[] variable
             # get microphone state outside of websocket
             with sd.Stream(callback=self.getSoundState):
-                sd.sleep(monitorTime)
+                sd.sleep(MONITOR_SEGMENT_LENGTH)
 
             async with websockets.connect(SERVER + ":" + str(PORT)) as self.websocket:
                 # first header should always be the connection (machine) name
@@ -48,8 +45,8 @@ class SoundListener():
         asyncio.get_event_loop().run_until_complete(self.websocketConnection())
 
 # program entry point
-# convert monitorTime variable to seconds
-monitorTime *= 1000
+# convert monitorTime variable to milliseconds
+MONITOR_SEGMENT_LENGTH *= 1000
 
 # start the main program
 SoundListenerOBJ = SoundListener()

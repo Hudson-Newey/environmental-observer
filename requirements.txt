@@ -1,0 +1,5 @@
+sounddevice
+numpy
+websockets
+mysql
+mysql-connector-python

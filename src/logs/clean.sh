@@ -1,1 +1,3 @@
-rm *.log
+#!/bin/bash
+
+rm ./*.log

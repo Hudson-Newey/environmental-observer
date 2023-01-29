@@ -1,14 +1,9 @@
+from util.constants import LOG_DIRECTORY, PORT, SOUND_THRESHOLD, SERVER
+from datetime import datetime
+
 import asyncio
 import websockets
-from datetime import datetime
 import os
-
-# constants
-# 1 = footsteps : 2 = talking : 3 = dropping : >4 = crashing
-SOUND_THRESHOLD = 1
-PORT = 8765
-LOGDIRECTORY = "logs/"
-
 
 # use a logs object to help with maintainability
 class Logs():
@@ -18,7 +13,7 @@ class Logs():
 
         # use the timestamp as the file name
         # this can be used in a big data situation to track sound levels over time
-        f = open(LOGDIRECTORY + timeStamp + ".log", "w")
+        f = open(f"{LOG_DIRECTORY}{timeStamp}.log", "w")
         f.write(text)
         f.close()
 
@@ -26,8 +21,8 @@ class Logs():
     # fileName = timestamp which you want to be deleted
     def deleteLog(self, fileName):
         # checks if the file exists to avoid runtime errors
-        if os.path.exists(LOGDIRECTORY + fileName):
-            os.remove(LOGDIRECTORY + fileName)
+        if os.path.exists(LOG_DIRECTORY + fileName):
+            os.remove(LOG_DIRECTORY + fileName)
         else:
             # ERROR 404, FILE NOT FOUND
             print("ERROR 404, FILE NOT FOUND!")
@@ -36,8 +31,8 @@ class Logs():
     # fileName = timestamp which you want to read
     # returns the contents of the given log
     def readLog(self, fileName):
-        if os.path.exists(LOGDIRECTORY + fileName):
-            return open(LOGDIRECTORY + fileName, "r").read()
+        if os.path.exists(LOG_DIRECTORY + fileName):
+            return open(LOG_DIRECTORY + fileName, "r").read()
         else:
             # ERROR 404, FILE NOT FOUND
             print("ERROR 404, FILE NOT FOUND!")
@@ -71,14 +66,14 @@ class Observer():
 
         # show the output for the current connection
         # shows the connection name (or room) and the amount of microphone states exceding the sound
-        print("[" + self.connectionName + "] : " + str(self.soundsHeard))
+        print(f"[{self.connectionName}] : {str(self.soundsHeard)}")
 
         # log the result through the Logs object
-        logsOBJ.writeLog("[" + self.connectionName + "] : " + str(self.soundsHeard))
+        logsObject.writeLog(f"[{self.connectionName}] : {str(self.soundsHeard)}")
 
     def __init__(self):
         # show output to prove the program is running
-        print("Starting websocket server on :" + str(PORT))
+        print(f"Starting websocket server on {SERVER}:{str(PORT)}")
 
         # create websocket listening server
         startServer = websockets.serve(self.websocketServer, "localhost", PORT)
@@ -88,5 +83,5 @@ class Observer():
 
 
 # program entry point
-logsOBJ = Logs()
-environmentalOberserver = Observer()
+logsObject = Logs()
+environmentalObserver = Observer()
